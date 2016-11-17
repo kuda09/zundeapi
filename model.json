@@ -1,0 +1,29 @@
+{
+  "person_details": {
+    "home_address": "",
+    "post_code": "",
+    "home_phone": "",
+    "date_of_birth": "",
+    "first_name": "kuda",
+    "last_name": "nyamainashe",
+    "contact_number": "07896582805",
+    "email_address": "ku-da@hotmail.co.uk"
+  },
+  "business_share": "",
+  "national_security_number": "",
+  "legal_name": "sgsgsg",
+  "business_address": "sgsgsg",
+  "post_code": "gsgsgsgs",
+  "business_phone": "sgsgsgsgs",
+  "business_trading_date": "sgsgsgsgs",
+  "legal_entity_type": "General Partnership",
+  "business_tax_id": "sgsgsgsg",
+  "annual_revenue": "sgsgsgsg",
+  "bank_balance": "gsgsgsgs",
+  "loan_details": {
+    "desired_amount": "$5000_to_$10000",
+    "date_required": "ONE_WEEK",
+    "loan_use": "BUYING_EQUIPMENT"
+  },
+  "how_did_you_hear_about_us": "online"
+}
