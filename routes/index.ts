@@ -6,6 +6,7 @@ var express = require('express');
 var router = express.Router();
 const mongoose = require('mongoose');
 var halson = require('halson');
+var personalLoan = personalLoan;
 
 mongoose.connect('mongodb://kuda09:305kuda@ds025742.mlab.com:25742/zunde');
 
@@ -28,14 +29,11 @@ router.post('/api/apply', (req: Request, res: Response, next: Function) => {
 
   let loan = req.body;
 
-  console.log(loan);
-  if(req.body === null) {
+  if(loan === null) {
 
     res.status(400);
     res.setHeader('Content-Type', 'application/vnd.error+json');
-    res.json({
-      message: 'No content in the body'
-    });
+    res.json({message: 'No content in the body'});
 
   } else {
 
