@@ -35,4 +35,4 @@ let personalLoanSchema = new Schema({
 
 let personalLoan = mongoose.model('personalLoan', personalLoanSchema);
 
-module.exports = personalLoan;
+export = personalLoan;
