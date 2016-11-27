@@ -2,7 +2,8 @@
 import {Request, Response} from "express";
 import {Db} from "mongodb";
 //import {personalLoan} from "../models/models";
-import {homePageController} from "../controllers/homePageController"
+import {homePageController} from "../controllers/homePageController";
+import {createUserController, getUsersController, deleteUserController, updateUserController, getUserController} from "../controllers/usersController";
 var express = require('express');
 var router = express.Router();
 const mongoose = require('mongoose');
@@ -14,20 +15,12 @@ var halson = require('halson');
 
 router.get('/', homePageController);
 
-router.get('/api', function(req: Request, res: Response, next: Function) {
+router.post('/api/users', createUserController);
+router.get('/api/users/:userid', getUserController);
+router.get('/api/users', getUsersController);
+router.delete('/api/users/:userid', deleteUserController);
+router.put('/api/users/:userid', updateUserController);
 
-  res.send('hello api stuff');
-});
-
-router.post('/api/register', (req: Request, res: Response, next: Function) => {
-
-
-})
-
-router.post('/api/apply', (req: Request, res: Response, next: Function) => {
-
-
-})
 
 
 

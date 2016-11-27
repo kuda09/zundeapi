@@ -10,6 +10,9 @@
               <option value="localhost:27017" />
             </list>
           </option>
+          <option name="sshTunnelingConfiguration">
+            <SshTunnelingConfiguration />
+          </option>
         </ServerConfiguration>
       </list>
     </option>
