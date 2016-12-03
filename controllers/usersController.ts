@@ -1,7 +1,14 @@
+///<reference path="../typings/tsd.d.ts"/>
+
+
 import {Request, Response} from "express";
 let mongoose = require("mongoose");
-import {users} from "../models/schemas/schemas";
-let users = mongoose.model('users');
+let passport  = require('passport');
+let Promise = require('bluebird');
+
+Promise.promisifyAll(mongoose);
+import {user} from "../models/schemas/schemas";
+let User = mongoose.model('user');
 
 let sendJSONResponse = (res, status, content) => {
     res.status(status);
@@ -10,59 +17,83 @@ let sendJSONResponse = (res, status, content) => {
 
 export let createUserController = function (req: Request, res: Response, next: Function) {
 
-    var user = {
-        username: req.body.username,
-        password: req.body.password
+    let body =  req.body;
+
+    if(!body.name || !body.username || !body.password){
+
+        sendJSONResponse(res, 400, {message: "All fields are required"});
+        return;
     }
 
+    var user = new User();
+    user.name  = body.name;
+    user.username = body.username;
+    user.setPassword(body.password);
 
-    console.log(user);
-    users.create(user, (err, user) => {
+    User.create(user, (err, user) => {
 
         if (err) {
 
             return sendJSONResponse(res, 400, err);
         }
 
-        sendJSONResponse(res, 201, user);
+        let token = user.generateJWT();
+        sendJSONResponse(res, 201, {"token": token});
 
-    })
-};
-export let getUsersController = function (req: Request, res: Response, next: Function) {
-
-    users.find('users').exec((err, users) => {
-        sendJSONResponse(res, 200, users);
     })
 };
 export let getUserController = function (req: Request, res: Response, next: Function) {
 
-    if (req.params && req.params.userid) {
+    let body =  req.body;
 
-        users
-            .findById(req.params.userid)
-            .select('username')
-            .exec((err, user) => {
-
-                if (!user) {
-
-                    sendJSONResponse(res, 200, {message: 'No user id not found'});
-
-                } else if (err) {
-
-                    sendJSONResponse(res, 404, err);
-                    return;
-                }
-
-                sendJSONResponse(res, 200, user);
-            })
-    } else {
-
-        sendJSONResponse(res, 404, {message: 'No location id in the request'})
+    if(!body.username || !body.password){
+        sendJSONResponse(res, 400, {message: "All fields are required"});
+        return;
     }
 
+    passport.authenticate('local', (err, user, info) => {
+        let token;
+
+        if(err) {
+            sendJSONResponse(res, 400, err);
+            return;
+        }
+
+        if(user){
+
+            token = user.generateJWT();
+            sendJSONResponse(res, 201, {"token": token});
+        } else {
+            sendJSONResponse(res, 401, info);
+        }
+
+    })(req,res);
+
+
+};
+
+
+export let getUsersController = function (req: Request, res: Response, next: Function) {
+
+    User.find('User').then((users) => {
+        sendJSONResponse(res, 200, users);
+    }, (err) => {
+        sendJSONResponse(res, 401, err);
+    })
 };
 export let deleteUserController = function (req: Request, res: Response, next: Function) {
-    res.render('index', {title: 'Get user controller'})
+
+    let body = req.body;
+
+    User.findOneAndRemove({
+        username: body.username
+    }).then(user => {
+
+        sendJSONResponse(res, 202, user)
+    }, (err) => {
+
+        sendJSONResponse(res, 401, err);
+    })
 };
 export let updateUserController = function (req: Request, res: Response, next: Function) {
 
@@ -72,7 +103,7 @@ export let updateUserController = function (req: Request, res: Response, next: F
         return;
     }
 
-    users.findById(req.params.userid)
+    User.findById(req.params.userid)
         .exec((err, user) => {
             if (!user) {
                 sendJSONResponse(res, 404, {"message": "userid not found"});

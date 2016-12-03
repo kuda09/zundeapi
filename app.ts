@@ -1,5 +1,5 @@
 /// <reference path="./typings/tsd.d.ts"/>
-
+require('dotenv').load();
 import {Request, Response} from "express";
 var express = require('express');
 var path = require('path');
@@ -7,8 +7,12 @@ var favicon = require('serve-favicon');
 var logger = require('morgan');
 var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
-var connections = require('./models/db');
+var passport = require('passport');
 
+
+
+var connections = require('./models/db');
+require('./config/password');
 let routes = require('./routes/index');
 let app = express();
 
@@ -26,6 +30,7 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
+app.use(passport.initialize());
 
 app.use('/', routes);
 
@@ -34,6 +39,15 @@ app.use((req: Request, res: Response, next: Function) => {
   var err: any = new Error('Not Found');
   err.status = 404;
   next(err);
+});
+app.use((err: Error, req: Request, res: Response, next: Function) => {
+
+    if(err.name === 'UnauthorizedError') {
+      res.status(401);
+      res.json({
+        "message": `${err.name} : ${err.message}`
+      })
+    }
 });
 
 // error handlers

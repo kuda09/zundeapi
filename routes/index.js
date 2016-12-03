@@ -6,12 +6,19 @@ var express = require('express');
 var router = express.Router();
 var mongoose = require('mongoose');
 var halson = require('halson');
+var jwt = require('express-jwt');
+var auth = jwt({
+    secret: process.env.JWT_SECRET,
+    userProperty: 'payload'
+});
 //mongoose.connect('mongodb://kuda09:305kuda@ds025742.mlab.com:25742/zunde');
 /* GET home page. */
+//To add authentication to the routes add the auth payload to the request
+//router.post('/locations/:locationid/reviews', auth, ctrlReviews.reviewsCreate);
 router.get('/', homePageController_1.homePageController);
-router.post('/api/users', usersController_1.createUserController);
-router.get('/api/users/:userid', usersController_1.getUserController);
+router.post('/api/user/register', usersController_1.createUserController);
+router.post('/api/user/login', usersController_1.getUserController);
 router.get('/api/users', usersController_1.getUsersController);
-router.delete('/api/users/:userid', usersController_1.deleteUserController);
-router.put('/api/users/:userid', usersController_1.updateUserController);
+router.delete('/api/user/:userid', usersController_1.deleteUserController);
+router.put('/api/user/:userid', usersController_1.updateUserController);
 module.exports = router;

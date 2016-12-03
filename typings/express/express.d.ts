@@ -227,8 +227,8 @@ declare module "express" {
              * `-1` when unsatisfiable, `-2` when syntactically invalid.
              *
              * NOTE: remember that ranges are inclusive, so
-             * for example "Range: users=0-3" should respond
-             * with 4 users when available, not 3.
+             * for example "Range: user=0-3" should respond
+             * with 4 user when available, not 3.
              *
              * @param size
              */
