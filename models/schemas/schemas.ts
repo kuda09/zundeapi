@@ -12,7 +12,33 @@ var userSchema = new mongoose.Schema({
         unique: true,
         required: true
     },
-    name: String,
+    person_details: {
+        first_name: String,-
+        last_name: String,
+        contact_number: Number,
+        home_address: String,
+        post_code: String,
+        dob: String,
+        share_total: String,
+        national_insurance: String
+    },
+    loan_details: {
+        desired_amount: Number,
+        date_required: Date,
+        loan_use: String,
+    },
+    business_details: {
+        legal_name: String,
+        business_address: String,
+        post_code: String,
+        business_phone: String,
+        business_trading_date: Date,
+        legal_entity_type: String,
+        business_tax_id: String,
+        annual_revenue: Number,
+        bank_balance: Number
+    },
+    how_did_you_hear_about_us: String,
     hash: String,
     salt: String
 });

@@ -26,8 +26,9 @@ router.get('/', homePageController);
 
 router.post('/api/user/register', createUserController);
 router.post('/api/user/login', getUserController);
-
 router.get('/api/users', getUsersController);
+
+
 router.delete('/api/user/:userid', deleteUserController);
 router.put('/api/user/:userid', updateUserController);
 
