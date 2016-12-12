@@ -13,18 +13,22 @@ var userSchema = new mongoose.Schema({
         required: true
     },
     person_details: {
-        first_name: String,-
+        first_name: {
+            required: true,
+            type: String
+        },
         last_name: String,
-        contact_number: Number,
+        contact_number: String,
         home_address: String,
         post_code: String,
+        home_phone: String,
         dob: String,
         share_total: String,
         national_insurance: String
     },
     loan_details: {
-        desired_amount: Number,
-        date_required: Date,
+        desired_amount: String,
+        date_required: String,
         loan_use: String,
     },
     business_details: {
@@ -32,11 +36,11 @@ var userSchema = new mongoose.Schema({
         business_address: String,
         post_code: String,
         business_phone: String,
-        business_trading_date: Date,
+        business_trading_date: String,
         legal_entity_type: String,
         business_tax_id: String,
-        annual_revenue: Number,
-        bank_balance: Number
+        annual_revenue: String,
+        bank_balance: String
     },
     how_did_you_hear_about_us: String,
     hash: String,

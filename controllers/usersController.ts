@@ -19,16 +19,16 @@ export let createUserController = function (req: Request, res: Response, next: F
 
     let body =  req.body;
 
-    if(!body.name || !body.username || !body.password){
+    if(!body.username || !body.password){
 
         sendJSONResponse(res, 400, {message: "All fields are required"});
         return;
     }
 
     var user = new User();
-    user.name  = body.name;
-    user.username = body.username;
-    user.setPassword(body.password);
+
+    console.log(body);
+    user = body;
 
     User.create(user, (err, user) => {
 
@@ -40,7 +40,7 @@ export let createUserController = function (req: Request, res: Response, next: F
         let token = user.generateJWT();
         sendJSONResponse(res, 201, {"token": token});
 
-    })
+    });
 };
 export let getUserController = function (req: Request, res: Response, next: Function) {
 
