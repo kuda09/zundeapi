@@ -29,8 +29,8 @@ router.post('/api/user/login', getUserController);
 router.get('/api/users', getUsersController);
 
 
-router.delete('/api/user/:userid', deleteUserController);
-router.put('/api/user/:userid', updateUserController);
+router.delete('/api/user/delete', auth, deleteUserController);
+router.put('/api/user/update', auth, updateUserController);
 
 
 

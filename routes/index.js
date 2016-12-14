@@ -19,6 +19,6 @@ router.get('/', homePageController_1.homePageController);
 router.post('/api/user/register', usersController_1.createUserController);
 router.post('/api/user/login', usersController_1.getUserController);
 router.get('/api/users', usersController_1.getUsersController);
-router.delete('/api/user/:userid', usersController_1.deleteUserController);
-router.put('/api/user/:userid', usersController_1.updateUserController);
+router.delete('/api/user/delete', auth, usersController_1.deleteUserController);
+router.put('/api/user/update', auth, usersController_1.updateUserController);
 module.exports = router;

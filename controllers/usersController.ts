@@ -3,12 +3,12 @@
 
 import {Request, Response} from "express";
 let mongoose = require("mongoose");
-let passport  = require('passport');
+let passport = require('passport');
 let Promise = require('bluebird');
 
 Promise.promisifyAll(mongoose);
 import {user} from "../models/schemas/schemas";
-let User = mongoose.model('user');
+let userSchema = mongoose.model('user');
 
 let sendJSONResponse = (res, status, content) => {
     res.status(status);
@@ -17,20 +17,25 @@ let sendJSONResponse = (res, status, content) => {
 
 export let createUserController = function (req: Request, res: Response, next: Function) {
 
-    let body =  req.body;
+    let body = req.body;
 
-    if(!body.username || !body.password){
+    if (!body.username || !body.password) {
 
         sendJSONResponse(res, 400, {message: "All fields are required"});
         return;
     }
 
-    var user = new User();
 
-    console.log(body);
-    user = body;
+    var user = new userSchema();
+    user.username = body.username;
+    user.person_details = body.person_details;
+    user.loan_details = body.loan_details;
+    user.personal_details = body.personal_details;
+    user.business_details = body.business_details;
+    user.how_did_you_hear_about_us = body.how_did_you_hear_about_us;
+    user.setPassword(body.password);
 
-    User.create(user, (err, user) => {
+    userSchema.create(user, (err, user) => {
 
         if (err) {
 
@@ -44,9 +49,9 @@ export let createUserController = function (req: Request, res: Response, next: F
 };
 export let getUserController = function (req: Request, res: Response, next: Function) {
 
-    let body =  req.body;
+    let body = req.body;
 
-    if(!body.username || !body.password){
+    if (!body.username || !body.password) {
         sendJSONResponse(res, 400, {message: "All fields are required"});
         return;
     }
@@ -54,12 +59,12 @@ export let getUserController = function (req: Request, res: Response, next: Func
     passport.authenticate('local', (err, user, info) => {
         let token;
 
-        if(err) {
+        if (err) {
             sendJSONResponse(res, 400, err);
             return;
         }
 
-        if(user){
+        if (user) {
 
             token = user.generateJWT();
             sendJSONResponse(res, 201, {"token": token});
@@ -67,7 +72,7 @@ export let getUserController = function (req: Request, res: Response, next: Func
             sendJSONResponse(res, 401, info);
         }
 
-    })(req,res);
+    })(req, res);
 
 
 };
@@ -75,7 +80,7 @@ export let getUserController = function (req: Request, res: Response, next: Func
 
 export let getUsersController = function (req: Request, res: Response, next: Function) {
 
-    User.find('User').then((users) => {
+    userSchema.find('User').then((users) => {
         sendJSONResponse(res, 200, users);
     }, (err) => {
         sendJSONResponse(res, 401, err);
@@ -85,15 +90,20 @@ export let deleteUserController = function (req: Request, res: Response, next: F
 
     let body = req.body;
 
-    User.findOneAndRemove({
-        username: body.username
-    }).then(user => {
+    if (req.payload && req.payload.email) {
 
-        sendJSONResponse(res, 202, user)
-    }, (err) => {
+        userSchema.findOneAndRemove({
+            username: body.username
+        }).then(user => {
 
-        sendJSONResponse(res, 401, err);
-    })
+            sendJSONResponse(res, 204, user.username)
+        }, (err) => {
+
+            sendJSONResponse(res, 404, err);
+        })
+    }
+
+
 };
 export let updateUserController = function (req: Request, res: Response, next: Function) {
 
@@ -109,7 +119,7 @@ export let updateUserController = function (req: Request, res: Response, next: F
                 sendJSONResponse(res, 404, {"message": "userid not found"});
                 return
             } else if (err) {
-                 sendJSONResponse(res, 400, err);
+                sendJSONResponse(res, 400, err);
                 return
             }
 

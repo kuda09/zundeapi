@@ -43,9 +43,27 @@ var userSchema = new mongoose.Schema({
         bank_balance: String
     },
     how_did_you_hear_about_us: String,
+    created_at: Date,
+    updated_at: Date,
     hash: String,
     salt: String
 });
+
+// on every save, add the date
+userSchema.pre('save', function(next) {
+    // get the current date
+    var currentDate = new Date();
+
+    // change the updated_at field to current date
+    this.updated_at = currentDate;
+
+    // if created_at doesn't exist, add to that field
+    if (!this.created_at)
+        this.created_at = currentDate;
+
+    next();
+});
+
 userSchema.methods.setPassword = function (password) {
     this.salt = crypto.randomBytes(16).toString('hex');
     this.hash = crypto.pbkdf2Sync(password, this.salt, 1000, 64).toString('hex');

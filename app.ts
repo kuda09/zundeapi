@@ -64,6 +64,16 @@ if (app.get('env') === 'development') {
   });
 }
 
+
+app.use((err: any, req: Request, res: Response, next: Function) => {
+
+  if(err.name === 'UnauthorizedError'){
+
+    res.status(401);
+    res.json({"message" : err.message});
+  }
+})
+
 // production error handler
 // no stacktraces leaked to user
 app.use((err: any, req: Request, res: Response, next: Function) => {
