@@ -75,7 +75,7 @@ export let getUserController = function (req: Request, res: Response, next: Func
             sendJSONResponse(res, 401, info);
         }
 
-    })(req, res);
+    })(req, res, next);
 
 
 };
@@ -108,7 +108,26 @@ export let deleteUserController = function (req: Request, res: Response, next: F
 };
 export let updateUserController = function (req: Request, res: Response, next: Function) {
 
+    let body = req.body;
+    let id = req.params.id;
 
 
+    userSchema.findOne({id: id})
+        .then((user) => {
+
+            if(!user)  {
+
+                sendJSONResponse(res, 400, {message: errorMessages.API.Register.usernameAndPassword});
+                return
+            } else {
+
+
+            }
+        })
+
+        .catch((err) => {
+
+            console.log(err);
+        })
 };
 

@@ -26,7 +26,7 @@ router.get('/api/users', getUsersController);
 
 
 router.delete('/api/user/delete', auth, deleteUserController);
-router.put('/api/user/update', auth, updateUserController);
+router.put('/api/user/update/:id', auth, updateUserController);
 
 
 

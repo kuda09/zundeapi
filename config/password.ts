@@ -11,8 +11,8 @@ Promise.promisifyAll(mongoose);
 /*var auth0Strategy = new Auth0Strategy({
     domain:       'zunde.eu.auth0.com',
     clientID:     'HEqIwQhIWpDgdCXlU7Rinh8RrfN5ulYZ',
-    clientSecret: 'your-client-secret',
-    callbackURL:  '/callback'
+    clientSecret: 'FpvAOOuCcSBLL3AlGxwpNh5x-U46YCRoyBKWJhTPnee2UELMd_gjdbKcbhpIHZoA',
+    callbackURL:  '/api/user/login'
 }, function (accessToken, refreshToken, extraParams, profile, done) {
 
     return done(null, profile);
