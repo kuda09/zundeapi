@@ -1,7 +1,12 @@
 let passport = require('passport');
 let LocalStrategy = require('passport-local');
-import {user} from "../models/schemas/schemas";
+let Promise = require('bluebird');
 let Auth0Strategy = require('passport-auth0');
+
+import {user} from "../models/schemas/schemas";
+import {errorMessages} from "../config/errorMsgs";
+
+Promise.promisifyAll(mongoose);
 
 /*var auth0Strategy = new Auth0Strategy({
     domain:       'zunde.eu.auth0.com',
@@ -24,6 +29,7 @@ var localStrategy = new LocalStrategy({usernameField: 'username'}, (username: st
 
             return done(null, user);
         })
+
     }
 );
 

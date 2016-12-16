@@ -1,6 +1,7 @@
 "use strict";
 /// <reference path="./typings/tsd.d.ts"/>
 require('dotenv').load();
+require('./config/password');
 var express = require('express');
 var path = require('path');
 var favicon = require('serve-favicon');
@@ -9,7 +10,8 @@ var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
 var passport = require('passport');
 var connections = require('./models/db');
-require('./config/password');
+var expressJWT = require('express-jwt');
+var expressUnless = require('express-unless');
 var routes = require('./routes/index');
 var app = express();
 // view engine setup
@@ -25,6 +27,12 @@ app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 app.use(passport.initialize());
 app.use('/', routes);
+app.use(expressJWT({ secret: process.env.JWT_SECRET })).expressUnless({
+    path: [
+        { url: '/api/user/login', methods: ['POST'] },
+        { url: '/api/user/register', methods: ['POST'] }
+    ]
+});
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {
     var err = new Error('Not Found');
@@ -39,9 +47,6 @@ app.use(function (err, req, res, next) {
         });
     }
 });
-// error handlers
-// development error handler
-// will print stacktrace
 if (app.get('env') === 'development') {
     app.use(function (err, req, res, next) {
         res.status(err.status || 500);
@@ -67,3 +72,4 @@ app.use(function (err, req, res, next) {
     });
 });
 module.exports = app;
+//# sourceMappingURL=app.js.map

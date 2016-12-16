@@ -1,10 +1,9 @@
 "use strict";
-//import {personalLoan} from "../models/models";
+/// <reference path="../typings/tsd.d.ts"/>
 var homePageController_1 = require("../controllers/homePageController");
 var usersController_1 = require("../controllers/usersController");
 var express = require('express');
 var router = express.Router();
-var mongoose = require('mongoose');
 var halson = require('halson');
 var jwt = require('express-jwt');
 var auth = jwt({
@@ -22,3 +21,4 @@ router.get('/api/users', usersController_1.getUsersController);
 router.delete('/api/user/delete', auth, usersController_1.deleteUserController);
 router.put('/api/user/update', auth, usersController_1.updateUserController);
 module.exports = router;
+//# sourceMappingURL=index.js.map

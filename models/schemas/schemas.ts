@@ -50,7 +50,7 @@ var userSchema = new mongoose.Schema({
 });
 
 // on every save, add the date
-userSchema.pre('save', function(next) {
+userSchema.pre('save', function (next) {
     // get the current date
     var currentDate = new Date();
 
@@ -63,7 +63,6 @@ userSchema.pre('save', function(next) {
 
     next();
 });
-
 userSchema.methods.setPassword = function (password) {
     this.salt = crypto.randomBytes(16).toString('hex');
     this.hash = crypto.pbkdf2Sync(password, this.salt, 1000, 64).toString('hex');
@@ -79,12 +78,11 @@ userSchema.methods.generateJWT = () => {
 
     return jwt.sign({
         _ids: this.id,
-        email: this.email,
-        name: this.name,
-        exp: parseInt(expiry.getTime() /1000)
+        username: this.username,
+        name: this.person_details.last_name,
+        exp: parseInt(expiry.getTime() / 1000)
     }, process.env.JWT_SECRET);
 
 }
-
 
 export var user = mongoose.model('user', userSchema);

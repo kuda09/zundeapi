@@ -1,12 +1,8 @@
 /// <reference path="../typings/tsd.d.ts"/>
-import {Request, Response} from "express";
-import {Db} from "mongodb";
-//import {personalLoan} from "../models/models";
 import {homePageController} from "../controllers/homePageController";
 import {createUserController, getUsersController, deleteUserController, updateUserController, getUserController} from "../controllers/usersController";
 let express = require('express');
 let router = express.Router();
-const mongoose = require('mongoose');
 let halson = require('halson');
 let jwt = require('express-jwt');
 let auth = jwt({
