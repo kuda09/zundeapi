@@ -3,21 +3,15 @@
 import {user} from "../models/schemas/schemas";
 import {API_ERROR_MESSAGES} from "../errors/errorMessages";
 import {Request, Response} from "express";
-import {removeNonUpdatableElementsFromObject} from "../helpers/utils";
+import {removeNonUpdatableElementsFromObject, sendJSONResponse} from "../helpers/utils";
 const mongoose = require("mongoose");
 const passport = require('passport');
 const Promise = require('bluebird');
 const _ = require("lodash");
 
 Promise.promisifyAll(mongoose);
-
-
 let userSchema = mongoose.model('user');
 
-let sendJSONResponse = (res, status, content) => {
-    res.status(status);
-    res.json(content);
-}
 
 export let createUserController = function (req: Request, res: Response, next: Function) {
 
@@ -79,8 +73,6 @@ export let getUserController = function (req: Request, res: Response, next: Func
 
 
 };
-
-
 export let getUsersController = function (req: Request, res: Response, next: Function) {
 
     userSchema.find('User')

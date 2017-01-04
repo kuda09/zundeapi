@@ -19,3 +19,8 @@ export function removeNonUpdatableElementsFromObject(obj) {
 
     return obj;
 }
+
+export function sendJSONResponse (res, status, content)  {
+    res.status(status);
+    res.json(content);
+}
