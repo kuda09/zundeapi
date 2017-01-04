@@ -10,10 +10,9 @@ const Promise = require('bluebird');
 const _ = require("lodash");
 
 Promise.promisifyAll(mongoose);
-let userSchema = mongoose.model('user');
+const userSchema = mongoose.model('user');
 
-
-export let createUserController = function (req: Request, res: Response, next: Function) {
+export const createUserController = function (req: Request, res: Response, next: Function) {
 
     let body = req.body;
 
@@ -43,8 +42,10 @@ export let createUserController = function (req: Request, res: Response, next: F
 
             return sendJSONResponse(res, 400, {code: err.code, message: API_ERROR_MESSAGES.register.genericError});
         })
+
+    next();
 };
-export let getUserController = function (req: Request, res: Response, next: Function) {
+export const getUserController = function (req: Request, res: Response, next: Function) {
 
     let body = req.body;
 
@@ -71,15 +72,19 @@ export let getUserController = function (req: Request, res: Response, next: Func
 
     })(req, res);
 
+    next();
+
 
 };
-export let getUsersController = function (req: Request, res: Response, next: Function) {
+export const getUsersController = function (req: Request, res: Response, next: Function) {
 
     userSchema.find('User')
         .then(users => sendJSONResponse(res, 200, users))
         .catch(err => sendJSONResponse(res, 401, err));
+
+    next();
 };
-export let deleteUserController = function (req: Request, res: Response, next: Function) {
+export const deleteUserController = function (req: Request, res: Response, next: Function) {
 
     let body = req.body;
 
@@ -87,8 +92,10 @@ export let deleteUserController = function (req: Request, res: Response, next: F
         .then(user => sendJSONResponse(res, 204, { message: 'User Deleted'}))
         .catch((err) => sendJSONResponse(res, 401, {code: err.code, message: API_ERROR_MESSAGES.delete.failedDelete}));
 
+    next();
+
 };
-export let updateUserController = function (req: Request, res: Response, next: Function) {
+export const updateUserController = function (req: Request, res: Response, next: Function) {
 
     const username = {username: req.body.username};
     var updatedUserObject = req.body;
@@ -103,5 +110,7 @@ export let updateUserController = function (req: Request, res: Response, next: F
                 .catch((err) => sendJSONResponse(res, 204, {code: err.code, message: API_ERROR_MESSAGES.register.genericError}));
         })
         .catch((err) => sendJSONResponse(res, 204, {code: err.code, message: API_ERROR_MESSAGES.update.noUserFound}));
+
+    next();
 };
 
