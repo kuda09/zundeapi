@@ -26,13 +26,9 @@ router.get('/', homePageController);
 
 router.post('/api/user/register', createUserController);
 router.post('/api/user/login', getUserController);
-router.get('/api/users', getUsersController);
-
+router.get('/api/users', auth, getUsersController);
 
 router.delete('/api/user/delete', auth, deleteUserController);
-router.put('/api/user/update', auth, updateUserController);
-
-
-
+router.patch('/api/user/update', auth, updateUserController);
 
 module.exports = router;

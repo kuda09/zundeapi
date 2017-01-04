@@ -1,20 +1,19 @@
 /// <reference path="./typings/tsd.d.ts"/>
 require('dotenv').load();
 import {Request, Response} from "express";
-var express = require('express');
-var path = require('path');
-var favicon = require('serve-favicon');
-var logger = require('morgan');
-var cookieParser = require('cookie-parser');
-var bodyParser = require('body-parser');
-var passport = require('passport');
+const express = require('express');
+const path = require('path');
+const favicon = require('serve-favicon');
+const logger = require('morgan');
+const cookieParser = require('cookie-parser');
+const bodyParser = require('body-parser');
+const passport = require('passport');
+const session = require('express-session');
 
-
-
-var connections = require('./models/db');
+const connections = require('./models/db');
 require('./config/password');
-let routes = require('./routes/index');
-let app = express();
+const routes = require('./routes/index');
+const app = express();
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
@@ -31,6 +30,19 @@ app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 app.use(passport.initialize());
+app.use(passport.session());
+
+app.use(session({
+  // Here we are creating a unique session identifier
+  secret: process.env.JWT_SECRET,
+  resave: true,
+  saveUninitialized: true
+}));
+app.use(function(req: Request, res: Response, next) {
+  res.header("Access-Control-Allow-Origin", "*");
+  res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+  next();
+});
 
 app.use('/', routes);
 

@@ -3,15 +3,15 @@ let LocalStrategy = require('passport-local');
 import {user} from "../models/schemas/schemas";
 let Auth0Strategy = require('passport-auth0');
 
-/*var auth0Strategy = new Auth0Strategy({
-    domain:       'zunde.eu.auth0.com',
-    clientID:     'HEqIwQhIWpDgdCXlU7Rinh8RrfN5ulYZ',
-    clientSecret: 'your-client-secret',
-    callbackURL:  '/callback'
+var auth0Strategy = new Auth0Strategy({
+    domain:       process.env.AUTH0_DOMAIN,
+    clientID:     process.env.AUTH0_CLIENT_ID,
+    clientSecret: process.env.JWT_SECRET,
+    callbackURL:  '/' + process.env.AUTH0_CALLBACK
 }, function (accessToken, refreshToken, extraParams, profile, done) {
 
     return done(null, profile);
-})*/
+})
 
 
 var localStrategy = new LocalStrategy({usernameField: 'username'}, (username: string, password: string, done) => {
@@ -28,5 +28,7 @@ var localStrategy = new LocalStrategy({usernameField: 'username'}, (username: st
 );
 
 passport.use(localStrategy);
-//passport.use(auth0Strategy);
+passport.use(auth0Strategy);
+
+
 
