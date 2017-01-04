@@ -1,22 +1,17 @@
 let passport = require('passport');
 let LocalStrategy = require('passport-local');
-let Promise = require('bluebird');
+import {user} from "../models/schemas/schemas";
 let Auth0Strategy = require('passport-auth0');
 
-import {user} from "../models/schemas/schemas";
-import {errorMessages} from "../config/errorMsgs";
-
-Promise.promisifyAll(mongoose);
-
-/*var auth0Strategy = new Auth0Strategy({
-    domain:       'zunde.eu.auth0.com',
-    clientID:     'HEqIwQhIWpDgdCXlU7Rinh8RrfN5ulYZ',
-    clientSecret: 'FpvAOOuCcSBLL3AlGxwpNh5x-U46YCRoyBKWJhTPnee2UELMd_gjdbKcbhpIHZoA',
-    callbackURL:  '/api/user/login'
+var auth0Strategy = new Auth0Strategy({
+    domain:       process.env.AUTH0_DOMAIN,
+    clientID:     process.env.AUTH0_CLIENT_ID,
+    clientSecret: process.env.JWT_SECRET,
+    callbackURL:  '/' + process.env.AUTH0_CALLBACK
 }, function (accessToken, refreshToken, extraParams, profile, done) {
 
     return done(null, profile);
-})*/
+})
 
 
 var localStrategy = new LocalStrategy({usernameField: 'username'}, (username: string, password: string, done) => {
@@ -29,10 +24,11 @@ var localStrategy = new LocalStrategy({usernameField: 'username'}, (username: st
 
             return done(null, user);
         })
-
     }
 );
 
 passport.use(localStrategy);
-//passport.use(auth0Strategy);
+passport.use(auth0Strategy);
+
+
 

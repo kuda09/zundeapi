@@ -9,6 +9,7 @@ var logger = require('morgan');
 var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
 var passport = require('passport');
+var session = require('express-session');
 var connections = require('./models/db');
 var expressJWT = require('express-jwt');
 var expressUnless = require('express-unless');
@@ -26,6 +27,18 @@ app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 app.use(passport.initialize());
+app.use(passport.session());
+app.use(session({
+    // Here we are creating a unique session identifier
+    secret: process.env.JWT_SECRET,
+    resave: true,
+    saveUninitialized: true
+}));
+app.use(function (req, res, next) {
+    res.header("Access-Control-Allow-Origin", "*");
+    res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+    next();
+});
 app.use('/', routes);
 app.use(expressJWT({ secret: process.env.JWT_SECRET })).expressUnless({
     path: [

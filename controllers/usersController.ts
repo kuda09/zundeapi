@@ -1,61 +1,56 @@
 ///<reference path="../typings/tsd.d.ts"/>
-import {Request, Response} from "express";
-import {user} from "../models/schemas/schemas";
-import {errorMessages} from "../config/errorMsgs";
 
-let mongoose = require("mongoose");
-let passport = require('passport');
-let Promise = require('bluebird');
+import {user} from "../models/schemas/schemas";
+import {API_ERROR_MESSAGES} from "../errors/errorMessages";
+import {Request, Response} from "express";
+import {removeNonUpdatableElementsFromObject, sendJSONResponse} from "../helpers/utils";
+const mongoose = require("mongoose");
+const passport = require('passport');
+const Promise = require('bluebird');
+const _ = require("lodash");
 
 Promise.promisifyAll(mongoose);
+const userSchema = mongoose.model('user');
 
-let userSchema = mongoose.model('user');
-let sendJSONResponse = (res, status, content) => {
-    res.status(status);
-    res.json(content);
-}
-let setSchema = (schema, body) => {
-
-    schema.username = body.username;
-    schema.person_details = body.person_details;
-    schema.loan_details = body.loan_details;
-    schema.personal_details = body.personal_details;
-    schema.business_details = body.business_details;
-    schema.how_did_you_hear_about_us = body.how_did_you_hear_about_us;
-    schema.setPassword(body.password);
-
-    return schema;
-
-}
-
-export let createUserController = function (req: Request, res: Response, next: Function) {
+export const createUserController = function (req: Request, res: Response, next: Function) {
 
     let body = req.body;
 
     if (!body.username || !body.password) {
-
-        sendJSONResponse(res, 400, {message: errorMessages.API.Register.usernameAndPassword});
-        return;
+        return sendJSONResponse(res, 400, {message: API_ERROR_MESSAGES.register.missingFields});
     }
 
     var user = new userSchema();
+    user.username = body.username;
+    user.person_details = body.person_details;
+    user.loan_details = body.loan_details;
+    user.personal_details = body.personal_details;
+    user.business_details = body.business_details;
+    user.how_did_you_hear_about_us = body.how_did_you_hear_about_us;
+    user.setPassword(body.password);
 
-    userSchema.create(setSchema(user, body))
-        .then(function (user) {
+    userSchema.create(user)
+        .then(user => {
             let token = user.generateJWT();
             sendJSONResponse(res, 201, {"token": token});
         })
-        .catch((err) => {
+        .catch(err => {
 
-            return sendJSONResponse(res, 400, err);
-        });
+            if (err.code === 11000) {
+                return sendJSONResponse(res, 400, {code: err.code, message: API_ERROR_MESSAGES.register.duplicateUsername});
+            }
+
+            return sendJSONResponse(res, 400, {code: err.code, message: API_ERROR_MESSAGES.register.genericError});
+        })
+
+    next();
 };
-export let getUserController = function (req: Request, res: Response, next: Function) {
+export const getUserController = function (req: Request, res: Response, next: Function) {
 
     let body = req.body;
 
     if (!body.username || !body.password) {
-        sendJSONResponse(res, 400, {message: errorMessages.API.Login.usernameAndPassword});
+        sendJSONResponse(res, 400, {message: "All fields are required"});
         return;
     }
 
@@ -75,59 +70,47 @@ export let getUserController = function (req: Request, res: Response, next: Func
             sendJSONResponse(res, 401, info);
         }
 
-    })(req, res, next);
+    })(req, res);
+
+    next();
 
 
 };
-export let getUsersController = function (req: Request, res: Response, next: Function) {
+export const getUsersController = function (req: Request, res: Response, next: Function) {
 
-    userSchema.find('User').then((users) => {
-        sendJSONResponse(res, 200, users);
-    }, (err) => {
-        sendJSONResponse(res, 401, err);
-    })
+    userSchema.find('User')
+        .then(users => sendJSONResponse(res, 200, users))
+        .catch(err => sendJSONResponse(res, 401, err));
+
+    next();
 };
-export let deleteUserController = function (req: Request, res: Response, next: Function) {
+export const deleteUserController = function (req: Request, res: Response, next: Function) {
 
     let body = req.body;
 
-    if (req.payload && req.payload.email) {
+    userSchema.findOneAndRemove({username: body.username})
+        .then(user => sendJSONResponse(res, 204, { message: 'User Deleted'}))
+        .catch((err) => sendJSONResponse(res, 401, {code: err.code, message: API_ERROR_MESSAGES.delete.failedDelete}));
 
-        userSchema.findOneAndRemove({
-            username: body.username
-        }).then(user => {
-
-            sendJSONResponse(res, 204, user.username)
-        }, (err) => {
-
-            sendJSONResponse(res, 404, err);
-        })
-    }
-
+    next();
 
 };
-export let updateUserController = function (req: Request, res: Response, next: Function) {
+export const updateUserController = function (req: Request, res: Response, next: Function) {
 
-    let body = req.body;
-    let id = req.params.id;
+    const username = {username: req.body.username};
+    var updatedUserObject = req.body;
 
-
-    userSchema.findOne({id: id})
+    userSchema.findOne(username)
         .then((user) => {
+            updatedUserObject = removeNonUpdatableElementsFromObject(updatedUserObject);
+            user = _.merge(user, updatedUserObject);
 
-            if(!user)  {
-
-                sendJSONResponse(res, 400, {message: errorMessages.API.Register.usernameAndPassword});
-                return
-            } else {
-
-
-            }
+            user.save(user)
+                .then(data => sendJSONResponse(res, 202, {data: updatedUserObject, message: "User details updated"}))
+                .catch((err) => sendJSONResponse(res, 204, {code: err.code, message: API_ERROR_MESSAGES.register.genericError}));
         })
+        .catch((err) => sendJSONResponse(res, 204, {code: err.code, message: API_ERROR_MESSAGES.update.noUserFound}));
 
-        .catch((err) => {
-
-            console.log(err);
-        })
+    next();
 };
 

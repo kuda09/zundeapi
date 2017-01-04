@@ -1,26 +1,24 @@
 /// <reference path="./typings/tsd.d.ts"/>
 require('dotenv').load();
-require('./config/password');
-
-let express = require('express');
-let path = require('path');
-let favicon = require('serve-favicon');
-let logger = require('morgan');
-let cookieParser = require('cookie-parser');
-let bodyParser = require('body-parser');
-let passport = require('passport');
-let connections = require('./models/db');
-let expressJWT = require('express-jwt');
-let expressUnless = require('express-unless');
-
 import {Request, Response} from "express";
+const express = require('express');
+const path = require('path');
+const favicon = require('serve-favicon');
+const logger = require('morgan');
+const cookieParser = require('cookie-parser');
+const bodyParser = require('body-parser');
+const passport = require('passport');
+const session = require('express-session');
 
-let routes = require('./routes/index');
-let app = express();
+const connections = require('./models/db');
+require('./config/password');
+const routes = require('./routes/index');
+const app = express();
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'hbs');
+
 
 connections();
 
@@ -32,16 +30,21 @@ app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 app.use(passport.initialize());
+app.use(passport.session());
+
+app.use(session({
+  // Here we are creating a unique session identifier
+  secret: process.env.JWT_SECRET,
+  resave: true,
+  saveUninitialized: true
+}));
+app.use(function(req: Request, res: Response, next) {
+  res.header("Access-Control-Allow-Origin", "*");
+  res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+  next();
+});
 
 app.use('/', routes);
-
-
-app.use(expressJWT({secret: process.env.JWT_SECRET})).expressUnless({
-  path: [
-      { url: '/api/user/login', methods: ['POST']},
-      { url: '/api/user/register', methods: ['POST']}
-  ]
-})
 
 // catch 404 and forward to error handler
 app.use((req: Request, res: Response, next: Function) => {
@@ -58,6 +61,11 @@ app.use((err: Error, req: Request, res: Response, next: Function) => {
       })
     }
 });
+
+// error handlers
+
+// development error handler
+// will print stacktrace
 if (app.get('env') === 'development') {
   app.use((err: any, req: Request, res: Response, next: Function) =>{
     res.status(err.status || 500);
@@ -67,6 +75,8 @@ if (app.get('env') === 'development') {
     });
   });
 }
+
+
 app.use((err: any, req: Request, res: Response, next: Function) => {
 
   if(err.name === 'UnauthorizedError'){
@@ -75,6 +85,7 @@ app.use((err: any, req: Request, res: Response, next: Function) => {
     res.json({"message" : err.message});
   }
 })
+
 // production error handler
 // no stacktraces leaked to user
 app.use((err: any, req: Request, res: Response, next: Function) => {
@@ -84,5 +95,6 @@ app.use((err: any, req: Request, res: Response, next: Function) => {
     error: {}
   });
 });
+
 
 module.exports = app;
