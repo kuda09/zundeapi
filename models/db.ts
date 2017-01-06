@@ -5,13 +5,12 @@ let connections = () => {
     let mongoose = require('mongoose');
     let dbURI = 'mongodb://localhost:27017/zunde';
 
-    mongoose.connect(dbURI);
-
     if(process.env.NODE_ENV === 'production') {
 
-        dbURI = 'mongodb://kud09:305kuda@ds025742.mlab.com:25742/zunde'
+        dbURI = 'mongodb://kud09:305kuda@ds025742.mlab.com:25742/zunde';
     }
 
+    mongoose.connect(dbURI);
 
 
     mongoose.connection.on('connected', () => {
